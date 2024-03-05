@@ -4,6 +4,9 @@ import App from './App.vue'
 import router from './router'
 
 import './assets/main.css'
+import Vuelidate from 'vuelidate'
+
+Vue.use(Vuelidate);
 
 new Vue({
   router,

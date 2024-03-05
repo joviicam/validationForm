@@ -1,84 +1,125 @@
 <template>
-  <div id="app">
-    <h1>Formulario</h1>
-    <form @submit.prevent="onSubmit">
-      <div class="form-group">
-        <label for="nombre">Nombre de usuario:</label>
-        <input type="text" id="nombre" v-model="usuario.nombre" v-validate="'required|min:3'">
-        <p class="error" v-if="errors.has('nombre')">{{ errors.first('nombre') }}</p>
+  <div>
+    <form v-on:submit.prevent="validar">
+      <div id="titulo">
+        <h1>Validación de un formulario en Vue</h1>
       </div>
-      <div class="form-group">
-        <label for="correo">Correo electrónico:</label>
-        <input type="email" id="correo" v-model="usuario.correo" v-validate="'required|email'">
-        <p class="error" v-if="errors.has('correo')">{{ errors.first('correo') }}</p>
+      <hr />
+      <div id="campos">
+        <div>
+          <label>Nombre: </label>
+          <input type="text" id="nombre" v-model="nombre" />
+          <div v-if="enviado && !$v.nombre.required" class="mensajeError">
+            Debe escribir un nombre.
+          </div>
+        </div>
+        <div>
+          <label>Edad: </label>
+          <input type="number" id="edad" v-model="edad" />
+          <div v-if="enviado && !$v.edad.required" class="mensajeError">
+            Debe escribir una edad.
+          </div>
+        </div>
+        <div>
+          <label>Email: </label>
+          <input type="text" id="email" v-model="email" />
+          <div v-if="enviado && !$v.email.required" class="mensajeError">
+            Debe escribir un email.
+          </div>
+          <div v-if="enviado && !$v.email.email" class="mensajeError">
+            Formato incorrecto.
+          </div>
+        </div>
+        <div>
+          <label>Contraseña: </label>
+          <input type="password" id="contrasena" v-model="contraseña" />
+          <div v-if="enviado && !$v.contraseña.required" class="mensajeError">
+            Debe escribir una contraseña.
+          </div>
+          <div v-if="enviado && !$v.contraseña.minLength" class="mensajeError">
+            La contraseña debe contener mínimo 6 caracteres.
+          </div>
+        </div>
+        <div>
+          <label>Confirmar contraseña: </label>
+          <input type="password" id="confirmarContraseña" v-model="confirmarContraseña" />
+          <div v-if="enviado && !$v.confirmarContraseña.required" class="mensajeError">
+            Debe escribir la confirmación de la contraseña.
+          </div>
+          <div v-if="enviado && !$v.confirmarContraseña.sameAsContraseña" class="mensajeError">
+            Las contraseñas deben coincidir.
+          </div>
+        </div>
+        <button>Validar</button>
       </div>
-      <div class="form-group">
-        <label for="contrasena">Contraseña:</label>
-        <input type="password" id="contrasena" v-model="usuario.contrasena" v-validate="'required|min:8'">
-        <p class="error" v-if="errors.has('contrasena')">{{ errors.first('contrasena') }}</p>
-      </div>
-      <div class="form-group">
-        <label for="codigo_postal">Código postal:</label>
-        <input type="number" id="codigo_postal" v-model="usuario.codigo_postal" v-validate="'required'">
-        <p class="error" v-if="errors.has('codigo_postal')">{{ errors.first('codigo_postal') }}</p>
-      </div>
-      <div class="form-group">
-        <label for="fecha_nacimiento">Fecha de nacimiento:</label>
-        <input type="date" id="fecha_nacimiento" v-model="usuario.fecha_nacimiento"
-          v-validate="'required|date_gte:18y'">
-        <p class="error" v-if="errors.has('fecha_nacimiento')">{{ errors.first('fecha_nacimiento') }}</p>
-      </div>
-      <div class="form-group">
-        <label for="imagen">Imagen:</label>
-        <input type="file" id="imagen" ref="imagen" @change="onFileChange">
-        <p class="error" v-if="errors.has('imagen')">{{ errors.first('imagen') }}</p>
-      </div>
-      <button type="submit">Enviar</button>
     </form>
   </div>
 </template>
 
 <script>
-  import Vue from 'vue';
-  import VeeValidate from 'vee-validate';
-
-  Vue.use(VeeValidate);
-
-  const app = new Vue({
-    el: '#app',
-    data: {
-      usuario: {
-        nombre: '',
-        correo: '',
-        contrasena: '',
-        codigo_postal: '',
-        fecha_nacimiento: '',
-        imagen: null,
-      },
-      errors: {}
+  import { validationMixin } from 'vuelidate'
+  import { required, minLength } from 'vuelidate/lib/validators'
+  export default {
+    name: "Formulario",
+    data() {
+      return {
+        nombre: "",
+        edad: "",
+        email: "",
+        contraseña: "",
+        confirmarContraseña: "",
+        enviado: false
+      }
+    },
+    validations: {
+      nombre: { required },
+      edad: { required },
+      email: { required, email },
+      contraseña: { required, minLength: minLength(6) },
+      confirmarContraseña: { required, sameAsContraseña: sameAs("contraseña") }
     },
     methods: {
-      onSubmit() {
-        this.$validator.validateAll().then((result) => {
-          if (result) {
-            // El formulario es válido
-            // Enviar datos al servidor
-            console.log('Formulario enviado');
-          } else {
-            // Mostrar errores
-            this.errors = this.$validator.errors;
-          }
-        });
-      },
-      onFileChange(e) {
-        const file = e.target.files[0];
-        if (!file.type.match('image.*')) {
-          this.errors.imagen = 'Solo se admiten archivos de imagen';
+      validar() {
+        this.enviado = true;
+        if (this.$v.$invalid) {
           return;
         }
-        this.usuario.imagen = file;
+        console.log("Formulario válido.");
       }
     }
-  });
-
+  }
 </script>
+
+<style scoped>
+  form {
+    width: fit-content;
+    padding-top: 20px;
+    border: 2px solid black;
+    box-shadow: 6px 6px 12px 1px;
+    border-radius: 20px;
+    margin: 0 auto;
+  }
+
+  #titulo {
+    padding: 0px 30px 0px 30px;
+  }
+
+  #campos {
+    padding: 50px;
+    text-align: left;
+    margin-left: 70px;
+  }
+
+  button {
+    margin-left: 35%;
+    margin-top: 20px;
+  }
+
+  input {
+    margin: 10px;
+  }
+
+  .mensajeError {
+    color: rgb(230, 0, 0);
+  }
+</style>
