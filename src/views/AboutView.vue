@@ -7,17 +7,31 @@
       <hr />
       <div id="campos">
         <div>
-          <label>Nombre: </label>
-          <input type="text" id="nombre" v-model="nombre" />
-          <div v-if="enviado && v$.nombre.$invalid" class="mensajeError">
-            Debe escribir un nombre.
+          <label>Id: </label>
+          <input type="number" id="id" v-model="id" />
+          <div v-if="enviado && v$.id.$invalid" class="mensajeError">
+            Debe escribir un id válido.
           </div>
         </div>
         <div>
-          <label>Edad: </label>
-          <input type="number" id="edad" v-model="edad" />
-          <div v-if="enviado && v$.edad.$invalid" class="mensajeError">
-            Debe escribir una edad.
+          <label>Texto: </label>
+          <input type="text" id="text" v-model="text" />
+          <div v-if="enviado && v$.text.$invalid" class="mensajeError">
+            Debe escribir un texto.
+          </div>
+        </div>
+        <div>
+          <label>Numero de tarjeta: </label>
+          <input type="number" id="card_number" v-model="card_number" />
+          <div v-if="enviado && v$.card_number.$invalid" class="mensajeError">
+            Debe escribir un numero de tarjeta válido (16 dígitos).
+          </div>
+        </div>
+        <div>
+          <label>RFC: </label>
+          <input type="text" id="rfc" v-model="rfc" />
+          <div v-if="enviado && v$.rfc.$invalid" class="mensajeError">
+            Debe escribir un rfc válido.
           </div>
         </div>
         <div>
@@ -28,21 +42,10 @@
           </div>
         </div>
         <div>
-          <label>Contraseña: </label>
-          <input type="password" id="contrasena" v-model="contraseña" />
-          <div v-if="enviado && v$.contraseña.$invalid" class="mensajeError">
-            Debe escribir una contraseña con al menos 6 caracteres.
-          </div>
-        </div>
-        <div>
-          <label>Confirmar contraseña: </label>
-          <input
-            type="password"
-            id="confirmarContraseña"
-            v-model="confirmarContraseña"
-          />
-          <div v-if="enviado && v$.confirmarContraseña.$invalid" class="mensajeError">
-            Las contraseñas deben coincidir.
+          <label>Número: </label>
+          <input type="number" id="number" v-model="number" />
+          <div v-if="enviado && v$.number.$invalid" class="mensajeError">
+            Debe escribir un número entre 10 y 30.
           </div>
         </div>
         <button type="submit">Validar</button>
@@ -53,32 +56,30 @@
 
 <script>
 import { useVuelidate } from "@vuelidate/core";
-import { required, minLength, email, sameAs } from "@vuelidate/validators";
+import { required, minLength, maxLength , email, helpers, minValue, maxValue } from "@vuelidate/validators";
 export default {
   setup() {
     return { v$: useVuelidate() };
   },
   data() {
     return {
-      nombre: "",
-      edad: "",
-      email: "",
-      contraseña: "",
-      confirmarContraseña: "",
       enviado: false,
+      id: "",
+      text: "",	
+      card_number: "",
+      rfc: "",
+      email: "",
+      number: "",
     };
   },
   validations() {
     return {
-      nombre: {
-        required  
-      },
-      edad: { required },
+      id: { required, minValue: minValue(1)},
+      text: { required },
+      card_number: { required, minLength: minLength(16), maxLength: maxLength(16), minValue: minValue(1000000000000000), maxValue: maxValue(9999999999999999)},
+      rfc: { required, regex: helpers.regex(/^([A-Z]{1}[AEIOU]{1}[A-Z]{2}[0-9]{2}[0-1]{1}[0-9]{1}[0-3]{1}[0-9]{1}[A-Z0-9]{3})$/) },
       email: { required, email },
-      contraseña: { required, minLength: minLength(6)},
-      confirmarContraseña: {
-        required, sameAsContraseña: sameAs(this.contraseña),
-      },
+      number: { required, minValue: minValue(10), maxValue: maxValue(30)},
     };
   },
   methods: {
