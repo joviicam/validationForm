@@ -1,20 +1,9 @@
-<template>
-  <div id="app">
-    <AboutView/>
-  </div>
-</template>
-
-<script>
-import AboutView from './views/AboutView.vue';
-
-export default {
-  name: 'App',
-  components: {
-    AboutView
-  }
-}
+<script setup>
 </script>
 
-<style>
+<template>
+  <!-- Router view base -->
+  <router-view />
+</template>
 
-</style>
+<style scoped></style>
